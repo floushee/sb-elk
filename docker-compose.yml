@@ -1,0 +1,57 @@
+version: '3'
+services:
+
+  elasticsearch:
+    image: elasticsearch:7.9.3
+    container_name: elasticsearch
+    volumes:
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - 9200:9200
+    networks:
+      - elk_network
+
+  kibana:
+    image: kibana:7.9.3
+    container_name: kibana
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk_network
+
+  logstash:
+    image: logstash:7.9.3
+    container_name: logstash
+    command: 'logstash -f /etc/logstash/logstash.conf'
+    volumes:
+      - ./logstash/logstash.conf:/etc/logstash/logstash.conf
+      - logs:/var/log/app
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk_network
+
+  app:
+    image: floushee/sb-elk-app
+    build:
+      context: .
+    container_name: app
+    volumes:
+      - logs:/app/logs
+    ports:
+      - 8080:8080
+    networks:
+      - app_network
+
+volumes:
+  logs:
+
+networks:
+  elk_network:
+    driver: bridge
+  app_network:
+    driver: bridge

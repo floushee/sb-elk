@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Spring Boot App with Elastic Stack</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<style>
+
+    body {
+        font-family: sans-serif;
+    }
+
+    a {
+        text-decoration: none;
+        color: steelblue;
+    }
+    #response-message {
+        color: green;
+    }
+</style>
+<body>
+<h1>Hi, my logs will be imported into the Elastic Stack!</h1>
+<p>You can create some log messages here:</p>
+<ul>
+    <li><a class="create-log-message" data-log-level="debug" href="#">Debug</a></li>
+    <li><a class="create-log-message" data-log-level="info" href="#">Info</a></li>
+    <li><a class="create-log-message" data-log-level="warn" href="#">Warn</a></li>
+    <li><a class="create-log-message" data-log-level="error" href="#">Error</a></li>
+    <li><a class="create-log-message" data-log-level="exception" href="#">Exception</a></li>
+</ul>
+<p id="response-message"></p>
+</body>
+<script>
+    let links = document.getElementsByClassName("create-log-message");
+    Array.from(links).forEach(link => {
+        link.addEventListener('click', (e) => {
+            let logLevel = e.target.dataset.logLevel;
+            fetch(`/${logLevel}Message`)
+                .then(response => {
+                    document.getElementById("response-message").innerHTML = `Created a new <b>${logLevel}</b> log entry.`
+                });
+        });
+    });
+</script>
+</html>
